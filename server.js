@@ -36,8 +36,6 @@ const allFunctions = {
             return init();
         });
     },
-    // WHEN I choose to add a department
-    // THEN I am prompted to enter the name of the department and that department is added to the database
     addDepartment() {
         inquirer.prompt(
             {
@@ -54,6 +52,47 @@ const allFunctions = {
             });
         });
     },
+    addRole() {
+        inquirer.prompt([
+            {
+                type: 'input',
+                message: 'What is this role\'s name?',
+                name: 'newRoleTitle'
+            },
+            {
+                type: 'input',
+                message: 'What is the salary for this role?',
+                name: 'newRoleSalary'
+            },
+            {
+                type: 'input',
+                message: 'What department is the role a part of?',
+                name: 'newRoleDept'
+            },
+        ]).then((answers) => {
+            const depIdTemp = `SELECT id FROM department WHERE name = '${answers.newRoleDept}'`;
+            db.query(depIdTemp.toString(), (err, results) => {
+                if (err) console.error(err);
+                const print = Object.values(results[0]).toString();
+                console.log(parseInt(print));
+                const inputID = parseInt(print);
+                const command = `INSERT INTO role (title, salary, department_id) VALUES ('${answers.newRoleTitle}', ${answers.newRoleSalary}, ${inputID})`;
+                db.query(command.toString(), (err, results) => {
+                    if (err) console.error(err);
+                    console.table(results);
+                    viewAllRoles();
+                    return init();
+            });
+            });
+            
+        });
+    },
+    // WHEN I choose to add an employee
+    // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+    addEmployee() {
+        
+    }
+
 }
 
 const init = () => {
@@ -62,7 +101,7 @@ const init = () => {
         {name: 'View All roles', value: 'viewAllRoles'},
         {name: 'View All Employees', value: 'viewAllEmployees'},
         {name: 'Add a Deparment', value: 'addDepartment'},
-        // {name: 'Add a Role', value: 'addRole'},
+        {name: 'Add a Role', value: 'addRole'},
         // {name: 'Add an Employee', value: 'addEmployee'},
         // {name: 'Update an Employee Role', value: 'updateRole'},
     ];
@@ -80,11 +119,7 @@ const init = () => {
 init();
 
 
-// WHEN I choose to add a role
-// THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
 
-// WHEN I choose to add an employee
-// THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
