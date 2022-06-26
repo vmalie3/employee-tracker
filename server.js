@@ -18,7 +18,11 @@ const db = mysql.createConnection(
 
 const allFunctions = {
     viewAllDepartments() {
-
+        db.query('SELECT * FROM department', (err, results) => {
+            if (err) console.error(err);
+            console.table(results);
+            return init();
+        })
     }
 }
 
