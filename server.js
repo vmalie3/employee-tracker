@@ -1,5 +1,33 @@
+// set up dependencies
+
+const mysql = require('mysql2');
+const inquirer = require('inquirer');
+require('console.table');
+
 // WHEN I start the application
-// THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+// THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, 
+//add a role, add an employee, and update an employee role
+
+const init = () => {
+    const choices = [
+        {name: 'View All Departments', value: 'viewAllDepartments'},
+        {name: 'View All roles', value: 'viewAllRoles'},
+        {name: 'View All Employees', value: 'viewAllEmployees'},
+        {name: 'Add a Deparment', value: 'addDepartment'},
+        {name: 'Add a Role', value: 'addRole'},
+        {name: 'Add an Employee', value: 'addEmployee'},
+        {name: 'Update an Employee Role', value: 'updateRole'},
+    ];
+
+    inquirer.prompt([
+        {
+            type: 'rawlist',
+            name: 'query',
+            message: 'Select an Option',
+            choices,
+        }
+    ]).then((answers) => allFunctions[answers.query]());
+};
 
 // WHEN I choose to view all departments
 // THEN I am presented with a formatted table showing department names and department ids
