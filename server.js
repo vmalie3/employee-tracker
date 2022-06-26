@@ -2,6 +2,7 @@
 
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const { debounce } = require('rxjs');
 require('console.table');
 
 const db = mysql.createConnection(
@@ -80,19 +81,85 @@ const allFunctions = {
                 db.query(command.toString(), (err, results) => {
                     if (err) console.error(err);
                     console.table(results);
-                    viewAllRoles();
                     return init();
             });
             });
             
         });
     },
-    // WHEN I choose to add an employee
-    // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
     addEmployee() {
-        
-    }
-
+        inquirer.prompt([
+            {
+                type: 'input',
+                message: 'What is the employee\'s first name',
+                name: 'firstName'
+            },
+            {
+                type: 'input',
+                message: 'What is the employee\'s last name',
+                name: 'lastName'
+            },
+            {
+                type: 'input',
+                message: 'What is the employee\'s role',
+                name: 'role'
+            },
+            {
+                type: 'input',
+                message: 'What is the employee\'s manager\'s name? If none, enter \'none\'',
+                name: 'manager'
+            },
+        ]).then((answers) => {
+            const getManagerId = `SELECT id FROM employee WHERE CONCAT(first_name, \' \', last_name) = \'${answers.manager}\';`;
+            const getRoleId = `SELECT id FROM role WHERE title = \'${answers.role}\'`;
+            db.query(getRoleId, (err, results) => {
+                if (err) console.error(err);
+                const str = Object.values(results[0]).toString();
+                console.log(parseInt(str));
+                const roleID = parseInt(str);
+                if (results.manager === 'none') {
+                    const command = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (\'${answers.firstName}\', \'${answers.lastName}\', ${roleID}, NULL);`;
+                    db.query(command, (err, results) => {
+                        if (err) console.error(err);
+                        console.table(results);
+                        return init();
+                    })
+                } else {
+                    db.query(getManagerId, (err, results) => {
+                        if (err) console.error(err);
+                        const print = Object.values(results[0]).toString();
+                        console.log(parseInt(print));
+                        const inputID = parseInt(print);
+                        const command = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (\'${answers.firstName}\', \'${answers.lastName}\', ${roleID}, ${inputID});`;
+                        db.query(command, (err, results) => {
+                            if (err) console.error(err);
+                            console.table(results);
+                            return init();
+                        })
+                    }) 
+                } 
+            })
+        })
+    },
+    // WHEN I choose to update an employee role
+    // THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
+    // updateRole() {
+    //     const getEmployeeChoices = 'SELECT * FROM employee'
+    //     db.query(getEmployeeChoices, (err, results) => {
+    //         if (err) console.error(err);
+    //         const employeeChoices = results.map(({id, first_name, last_name}) => ({name: first_name + ' ' + last_name, value: id}));
+    //         inquirer.prompt([
+    //             {
+    //                 type: 'list',
+    //                 name: 'name',
+    //                 message: 'Which employee do you want to update?',
+    //                 choices: employeeChoices
+    //             }
+    //         ]).then(choice => {
+    //             const 
+    //         })
+    //     })
+    // }
 }
 
 const init = () => {
@@ -102,7 +169,7 @@ const init = () => {
         {name: 'View All Employees', value: 'viewAllEmployees'},
         {name: 'Add a Deparment', value: 'addDepartment'},
         {name: 'Add a Role', value: 'addRole'},
-        // {name: 'Add an Employee', value: 'addEmployee'},
+        {name: 'Add an Employee', value: 'addEmployee'},
         // {name: 'Update an Employee Role', value: 'updateRole'},
     ];
 
@@ -121,5 +188,3 @@ init();
 
 
 
-// WHEN I choose to update an employee role
-// THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
