@@ -24,5 +24,5 @@ CREATE TABLE employee (
     role_id INT NOT NULL,
     FOREIGN KEY (role_id)
     REFERENCES role(id),
-    manager_id IF (role(title) = 'Manager', NULL, INT NOT NULL)
+    manager_id INT
 )
