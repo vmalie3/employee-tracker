@@ -13,8 +13,10 @@ const db = mysql.createConnection(
     }
 );
 
-// WHEN I choose to view all departments
-// THEN I am presented with a formatted table showing department names and department ids
+// WHEN I choose to view all roles
+// THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
+// WHEN I choose to view all employees
+// THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
 
 const allFunctions = {
     viewAllDepartments() {
@@ -22,8 +24,23 @@ const allFunctions = {
             if (err) console.error(err);
             console.table(results);
             return init();
-        })
-    }
+        });
+    },
+    viewAllRoles() {
+        db.query('SELECT * FROM role', (err, results) => {
+            if (err) console.error(err);
+            console.table(results);
+            return init();
+        });
+    },
+    viewAllEmployees() {
+        db.query('SELECT employee.id, CONCAT(first_name, \' \', last_name) AS employee_name, manager_id, title, salary, name AS department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id;' 
+            , (err, results) => {
+            if (err) console.error(err);
+            console.table(results);
+            return init();
+        });
+    },
 }
 
 const init = () => {
@@ -31,10 +48,10 @@ const init = () => {
         {name: 'View All Departments', value: 'viewAllDepartments'},
         {name: 'View All roles', value: 'viewAllRoles'},
         {name: 'View All Employees', value: 'viewAllEmployees'},
-        {name: 'Add a Deparment', value: 'addDepartment'},
-        {name: 'Add a Role', value: 'addRole'},
-        {name: 'Add an Employee', value: 'addEmployee'},
-        {name: 'Update an Employee Role', value: 'updateRole'},
+        // {name: 'Add a Deparment', value: 'addDepartment'},
+        // {name: 'Add a Role', value: 'addRole'},
+        // {name: 'Add an Employee', value: 'addEmployee'},
+        // {name: 'Update an Employee Role', value: 'updateRole'},
     ];
 
     inquirer.prompt([
@@ -47,8 +64,7 @@ const init = () => {
     ]).then((answers) => allFunctions[answers.query]());
 };
 
-// WHEN I choose to view all roles
-// THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
+init();
 
 // WHEN I choose to view all employees
 // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
