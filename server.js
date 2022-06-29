@@ -65,26 +65,34 @@ const allFunctions = {
                 message: 'What is the salary for this role?',
                 name: 'newRoleSalary'
             },
-            {
-                type: 'input',
-                message: 'What department is the role a part of?',
-                name: 'newRoleDept'
-            },
         ]).then((answers) => {
-            const depIdTemp = `SELECT id FROM department WHERE name = '${answers.newRoleDept}'`;
-            db.query(depIdTemp.toString(), (err, results) => {
+            const newRoleTitle = answers.newRoleTitle;
+            const newRoleSalary = answers.newRoleSalary;
+
+            const getChoices = `SELECT * FROM department`;
+
+            db.query(getChoices, (err, results) => {
                 if (err) console.error(err);
-                const print = Object.values(results[0]).toString();
-                console.log(parseInt(print));
-                const inputID = parseInt(print);
-                const command = `INSERT INTO role (title, salary, department_id) VALUES ('${answers.newRoleTitle}', ${answers.newRoleSalary}, ${inputID})`;
-                db.query(command.toString(), (err, results) => {
-                    if (err) console.error(err);
-                    console.table(results);
-                    return init();
-            });
-            });
-            
+                const deptChoices = results.map(({name, id}) => ({name: name, value: id}));
+                
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'dept',
+                        message: 'What department is this role in?',
+                        choices: deptChoices
+                    },
+                ]).then((deptChoice) => {
+                    const dept = deptChoice.dept;
+                    const newRoleSql = `INSERT INTO role (title, salary, department_id) VALUES ('${newRoleTitle}', ${newRoleSalary}, ${dept});`
+                    
+                    db.query(newRoleSql, (err, results) => {
+                        if (err) console.error(err);
+                        console.log(`${newRoleTitle} successfully added`);
+                        init();
+                    })
+                })
+            })
         });
     },
     addEmployee() {
