@@ -15,7 +15,7 @@ I used inquirer and mysql to make this program work.
 
 ## Visuals
 
-None yet
+![Employee Tracker Gif](./visuals/gifEmployeeTracker.gif)
 
 ## Resources
 
