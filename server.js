@@ -128,7 +128,7 @@ const allFunctions = {
                 ]).then((answer) => {
                     const role = answer.role;
 
-                    const getManagerChoices = `SELECT CONCAT(first_name, last_name) AS name, id FROM employee;`;
+                    const getManagerChoices = `SELECT CONCAT(first_name, ' ', last_name) AS name, id FROM employee;`;
 
                     db.query(getManagerChoices, (err, results) => {
                         if (err) console.error(err);
@@ -159,7 +159,7 @@ const allFunctions = {
         })
     },
     updateRole() {
-        const getEmpChoices = `SELECT id, CONCAT(first_name, last_name) AS name FROM employee`
+        const getEmpChoices = `SELECT id, CONCAT(first_name, ' ', last_name) AS name FROM employee`
         db.query(getEmpChoices, (err, results) => {
             if (err) console.error(err);
             const empChoices = results.map(({ name, id }) => ({ name: name, value: id }));

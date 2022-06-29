@@ -13,8 +13,6 @@ For this project, I used schema.sql in the db folder to set up my data tables. I
 
 I used inquirer and mysql to make this program work.
 
-I am still working on fixing the last function and changing my code to make it simpler (like using map). 
-
 ## Visuals
 
 None yet
